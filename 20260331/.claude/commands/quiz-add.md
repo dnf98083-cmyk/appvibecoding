@@ -35,10 +35,7 @@
 
 4. **questions.json에 추가** — questions 배열 끝에 삽입
 
-5. **검증 실행**
-```
-python -X utf8 validator.py
-```
+5. **검증 실행** — pytest tests/test_quiz.py 를 실행해서 통과 여부 확인
 
 ## 주의사항
 - 카테고리는 반드시 **한국사 / 과학 / 지리 / 일반상식** 중 하나

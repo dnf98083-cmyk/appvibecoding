@@ -1,0 +1,224 @@
+{
+  "questions": [
+    {
+      "id": 1,
+      "category": "역사",
+      "difficulty": "쉬움",
+      "question": "조선을 건국한 인물은 누구인가?",
+      "choices": ["이성계", "이방원", "왕건", "견훤", "궁예"],
+      "answer": 0,
+      "explanation": "이성계는 1392년 위화도 회군 이후 고려를 멸망시키고 조선을 건국했습니다.",
+      "source": "한국사 교과서, 조선왕조실록",
+      "confidence": 0.99
+    },
+    {
+      "id": 2,
+      "category": "과학",
+      "difficulty": "보통",
+      "question": "빛의 속도는 초속 약 몇 km인가?",
+      "choices": ["약 30만 km", "약 3만 km", "약 300만 km", "약 3000km", "약 3억 km"],
+      "answer": 0,
+      "explanation": "진공에서 빛의 속도는 약 299,792km/s로, 약 30만 km/s입니다.",
+      "source": "NIST 물리상수, Physics textbooks",
+      "confidence": 0.99
+    },
+    {
+      "id": 3,
+      "category": "지리",
+      "difficulty": "쉬움",
+      "question": "세계에서 가장 긴 강은?",
+      "choices": ["나일강", "아마존강", "양쯔강", "미시시피강", "한강"],
+      "answer": 0,
+      "explanation": "나일강은 약 6,650km로 세계에서 가장 긴 강으로 알려져 있습니다. (일부 연구에서는 아마존강이 더 길다고 주장하기도 합니다)",
+      "source": "National Geographic, Encyclopaedia Britannica",
+      "confidence": 0.85
+    },
+    {
+      "id": 4,
+      "category": "문화",
+      "difficulty": "쉬움",
+      "question": "올림픽의 발상지는 어느 나라인가?",
+      "choices": ["그리스", "이탈리아", "프랑스", "영국", "미국"],
+      "answer": 0,
+      "explanation": "고대 올림픽은 기원전 776년 그리스 올림피아에서 시작되었습니다.",
+      "source": "IOC 공식 역사, 고대 그리스 문헌",
+      "confidence": 0.99
+    },
+    {
+      "id": 5,
+      "category": "과학",
+      "difficulty": "어려움",
+      "question": "DNA의 이중나선 구조를 발견한 과학자는?",
+      "choices": ["왓슨과 크릭", "다윈과 멘델", "퀴리 부인", "아인슈타인", "뉴턴"],
+      "answer": 0,
+      "explanation": "제임스 왓슨과 프랜시스 크릭은 1953년 DNA의 이중나선 구조를 발견했습니다. (로잘린드 프랭클린의 X선 데이터가 결정적 역할을 했습니다)",
+      "source": "Nature journal, 1953 / Nobel Prize records",
+      "confidence": 0.97
+    },
+    {
+      "id": 6,
+      "category": "역사",
+      "difficulty": "보통",
+      "question": "제1차 세계대전이 시작된 해는?",
+      "choices": ["1914년", "1918년", "1939년", "1905년", "1920년"],
+      "answer": 0,
+      "explanation": "제1차 세계대전은 1914년 오스트리아-헝가리 황태자 암살 사건을 계기로 시작되었습니다.",
+      "source": "역사 교과서, Encyclopaedia Britannica",
+      "confidence": 0.99
+    },
+    {
+      "id": 7,
+      "category": "지리",
+      "difficulty": "보통",
+      "question": "세계에서 가장 높은 산은?",
+      "choices": ["에베레스트산", "K2", "칸첸중가", "로체", "마칼루"],
+      "answer": 0,
+      "explanation": "에베레스트산(8,848.86m)은 해발 고도 기준 세계에서 가장 높은 산입니다.",
+      "source": "국립지리원, National Geographic",
+      "confidence": 0.99
+    },
+    {
+      "id": 8,
+      "category": "문화",
+      "difficulty": "보통",
+      "question": "셰익스피어의 4대 비극에 속하지 않는 작품은?",
+      "choices": ["베니스의 상인", "햄릿", "맥베스", "리어왕", "오셀로"],
+      "answer": 0,
+      "explanation": "셰익스피어 4대 비극은 햄릿, 맥베스, 리어왕, 오셀로입니다. 베니스의 상인은 희극입니다.",
+      "source": "Shakespeare's Complete Works, 문학 교과서",
+      "confidence": 0.98
+    },
+    {
+      "id": 9,
+      "category": "과학",
+      "difficulty": "쉬움",
+      "question": "물의 화학식은?",
+      "choices": ["H2O", "CO2", "NaCl", "H2SO4", "O2"],
+      "answer": 0,
+      "explanation": "물은 수소 원자 2개와 산소 원자 1개로 이루어진 화합물로 화학식은 H2O입니다.",
+      "source": "화학 교과서, IUPAC",
+      "confidence": 0.99
+    },
+    {
+      "id": 10,
+      "category": "역사",
+      "difficulty": "어려움",
+      "question": "한글을 창제한 왕은?",
+      "choices": ["세종대왕", "태종", "성종", "중종", "선조"],
+      "answer": 0,
+      "explanation": "세종대왕은 1443년 훈민정음(한글)을 창제하고 1446년에 반포했습니다.",
+      "source": "훈민정음 해례본, 조선왕조실록",
+      "confidence": 0.99
+    },
+    {
+      "id": 11,
+      "category": "지리",
+      "difficulty": "쉬움",
+      "question": "대한민국의 수도는?",
+      "choices": ["서울", "부산", "인천", "대구", "수원"],
+      "answer": 0,
+      "explanation": "서울은 대한민국의 수도이자 최대 도시입니다.",
+      "source": "대한민국 헌법, 행정구역",
+      "confidence": 0.99
+    },
+    {
+      "id": 12,
+      "category": "과학",
+      "difficulty": "어려움",
+      "question": "원소 주기율표에서 원자번호 1번 원소는?",
+      "choices": ["수소(H)", "헬륨(He)", "리튬(Li)", "산소(O)", "탄소(C)"],
+      "answer": 0,
+      "explanation": "수소(H)는 원자번호 1번으로, 우주에서 가장 풍부한 원소입니다.",
+      "source": "IUPAC 주기율표, 화학 교과서",
+      "confidence": 0.99
+    },
+    {
+      "id": 13,
+      "category": "문화",
+      "difficulty": "어려움",
+      "question": "모나리자를 그린 화가는?",
+      "choices": ["레오나르도 다 빈치", "미켈란젤로", "라파엘로", "렘브란트", "피카소"],
+      "answer": 0,
+      "explanation": "모나리자는 레오나르도 다 빈치가 1503~1519년 사이에 그린 작품으로 현재 루브르 박물관에 소장되어 있습니다.",
+      "source": "루브르 박물관 공식 자료, 미술사 교과서",
+      "confidence": 0.99
+    },
+    {
+      "id": 14,
+      "category": "역사",
+      "difficulty": "어려움",
+      "question": "프랑스 혁명이 일어난 해는?",
+      "choices": ["1789년", "1776년", "1804년", "1815년", "1848년"],
+      "answer": 0,
+      "explanation": "프랑스 혁명은 1789년 바스티유 감옥 습격으로 시작되었습니다.",
+      "source": "세계사 교과서, Encyclopaedia Britannica",
+      "confidence": 0.99
+    },
+    {
+      "id": 15,
+      "category": "지리",
+      "difficulty": "어려움",
+      "question": "세계에서 면적이 가장 큰 나라는?",
+      "choices": ["러시아", "캐나다", "중국", "미국", "브라질"],
+      "answer": 0,
+      "explanation": "러시아의 면적은 약 1,710만 km²로 세계에서 가장 큰 나라입니다.",
+      "source": "UN 통계, Encyclopaedia Britannica",
+      "confidence": 0.99
+    },
+    {
+      "id": 16,
+      "category": "과학",
+      "difficulty": "보통",
+      "question": "태양계에서 가장 큰 행성은?",
+      "choices": ["목성", "토성", "천왕성", "해왕성", "지구"],
+      "answer": 0,
+      "explanation": "목성은 지름이 약 142,984km로 태양계에서 가장 큰 행성입니다.",
+      "source": "NASA, 천문학 교과서",
+      "confidence": 0.99
+    },
+    {
+      "id": 17,
+      "category": "문화",
+      "difficulty": "쉬움",
+      "question": "BTS의 소속사는?",
+      "choices": ["HYBE(하이브)", "SM엔터테인먼트", "YG엔터테인먼트", "JYP엔터테인먼트", "큐브엔터테인먼트"],
+      "answer": 0,
+      "explanation": "BTS는 빅히트 엔터테인먼트(현 HYBE) 소속으로 2013년 데뷔했습니다.",
+      "source": "HYBE 공식 사이트, 빌보드",
+      "confidence": 0.99
+    },
+    {
+      "id": 18,
+      "category": "역사",
+      "difficulty": "보통",
+      "question": "2002년 한일 월드컵에서 한국의 최종 성적은?",
+      "choices": ["4강(준결승)", "우승", "준우승", "8강", "16강"],
+      "answer": 0,
+      "explanation": "2002 한일 월드컵에서 대한민국은 4강에 진출하며 역대 최고 성적을 기록했습니다.",
+      "source": "FIFA 공식 기록, KFA",
+      "confidence": 0.99
+    },
+    {
+      "id": 19,
+      "category": "과학",
+      "difficulty": "어려움",
+      "question": "인체에서 가장 큰 장기는?",
+      "choices": ["피부", "간", "폐", "뇌", "소장"],
+      "answer": 0,
+      "explanation": "피부는 면적 약 1.5~2m²로 인체에서 가장 큰 기관입니다. 장기 중 '내장'만 고려하면 간이 가장 큽니다.",
+      "source": "의학 교과서, Gray's Anatomy",
+      "confidence": 0.82
+    },
+    {
+      "id": 20,
+      "category": "지리",
+      "difficulty": "보통",
+      "question": "나일강이 흐르는 대륙은?",
+      "choices": ["아프리카", "아시아", "유럽", "남아메리카", "북아메리카"],
+      "answer": 0,
+      "explanation": "나일강은 아프리카 대륙을 흐르며, 이집트를 통해 지중해로 유입됩니다.",
+      "source": "National Geographic, 세계지리 교과서",
+      "confidence": 0.99
+    }
+  ]
+}

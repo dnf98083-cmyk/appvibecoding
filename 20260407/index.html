@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>냉장고 레시피 추천</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', sans-serif;
+  background: #f0f4f8;
+  min-height: 100vh;
+  color: #1a202c;
+}
+
+/* ── 인증 화면 ── */
+#auth-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+.auth-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 36px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.10);
+}
+.auth-box h1 { font-size: 1.6rem; text-align: center; margin-bottom: 6px; }
+.auth-box .sub { text-align: center; color: #718096; font-size: 0.9rem; margin-bottom: 28px; }
+.auth-tabs { display: flex; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0; margin-bottom: 24px; }
+.auth-tab {
+  flex: 1; padding: 10px; text-align: center; cursor: pointer;
+  font-size: 0.9rem; font-weight: 600; color: #718096; background: #f7fafc;
+  transition: all 0.2s;
+}
+.auth-tab.active { background: #667eea; color: #fff; }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 0.82rem; font-weight: 600; color: #4a5568; margin-bottom: 6px; }
+.field input {
+  width: 100%; padding: 11px 14px;
+  border: 1px solid #e2e8f0; border-radius: 9px;
+  font-size: 0.95rem; outline: none;
+}
+.field input:focus { border-color: #667eea; }
+.auth-btn {
+  width: 100%; padding: 13px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: #fff; border: none; border-radius: 10px;
+  font-size: 1rem; font-weight: 700; cursor: pointer; margin-top: 4px;
+}
+.auth-error { color: #e53e3e; font-size: 0.82rem; margin-top: 10px; text-align: center; }
+
+/* ── 메인 앱 ── */
+#app-screen { display: none; }
+
+/* 네비게이션 */
+nav {
+  background: #fff;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+  position: sticky; top: 0; z-index: 50;
+}
+.nav-inner {
+  max-width: 720px; margin: 0 auto;
+  display: flex; align-items: center;
+  padding: 0 20px; height: 56px;
+}
+.nav-logo { font-size: 1.1rem; font-weight: 700; margin-right: auto; }
+.nav-menu { display: flex; gap: 4px; }
+.nav-item {
+  padding: 7px 14px; border-radius: 8px;
+  font-size: 0.87rem; font-weight: 600; cursor: pointer;
+  color: #718096; transition: all 0.15s; border: none; background: none;
+}
+.nav-item:hover { background: #f0f4f8; }
+.nav-item.active { background: #ebf4ff; color: #667eea; }
+.nav-user {
+  margin-left: 16px; font-size: 0.82rem; color: #a0aec0;
+  display: flex; align-items: center; gap: 8px;
+}
+.nav-user button {
+  background: none; border: 1px solid #e2e8f0; border-radius: 6px;
+  padding: 4px 10px; font-size: 0.78rem; cursor: pointer; color: #718096;
+}
+.nav-user button:hover { border-color: #e53e3e; color: #e53e3e; }
+
+/* 페이지 컨테이너 */
+.page { display: none; padding: 24px 16px; max-width: 720px; margin: 0 auto; }
+.page.active { display: block; }
+
+/* 카드 */
+.card {
+  background: #fff; border-radius: 16px; padding: 24px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 20px;
+}
+.card h2 {
+  font-size: 1rem; font-weight: 600; color: #4a5568;
+  margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+}
+
+/* 업로드 */
+#drop-zone {
+  border: 2px dashed #cbd5e0; border-radius: 12px;
+  padding: 40px 20px; text-align: center; cursor: pointer;
+  transition: all 0.2s; background: #f7fafc;
+}
+#drop-zone:hover, #drop-zone.dragover { border-color: #667eea; background: #ebf4ff; }
+#drop-zone .icon { font-size: 2.5rem; margin-bottom: 10px; }
+#drop-zone p { color: #718096; font-size: 0.9rem; }
+#drop-zone strong { color: #667eea; }
+#file-input { display: none; }
+#preview-wrap { display: none; margin-top: 16px; text-align: center; }
+#preview-wrap img { max-width: 100%; max-height: 260px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+#change-btn { display: inline-block; margin-top: 8px; font-size: 0.8rem; color: #667eea; cursor: pointer; background: none; border: none; text-decoration: underline; }
+
+/* 버튼 */
+.btn { display: block; width: 100%; padding: 13px; border: none; border-radius: 10px; font-size: 0.97rem; font-weight: 600; cursor: pointer; transition: opacity 0.2s, transform 0.1s; margin-top: 12px; }
+.btn:active { transform: scale(0.98); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; }
+.btn-secondary { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; }
+.btn-demo { background: #edf2f7; color: #4a5568; font-size: 0.83rem; margin-top: 8px; }
+
+/* 태그 */
+#ingredient-section { display: none; }
+#tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; min-height: 32px; }
+.tag { background: #ebf4ff; color: #3b82f6; border-radius: 20px; padding: 5px 12px; font-size: 0.84rem; display: flex; align-items: center; gap: 6px; }
+.tag button { background: none; border: none; cursor: pointer; color: #a0aec0; font-size: 0.85rem; padding: 0; }
+.tag button:hover { color: #e53e3e; }
+#add-row { display: flex; gap: 8px; margin-top: 4px; }
+#add-row input { flex: 1; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 0.88rem; outline: none; }
+#add-row input:focus { border-color: #667eea; }
+#add-row button { padding: 8px 16px; background: #667eea; color: #fff; border: none; border-radius: 8px; cursor: pointer; font-size: 0.88rem; }
+
+/* 레시피 */
+#recipe-section { display: none; }
+.recipe-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.recipe-header h2 { margin-bottom: 0; }
+#reanalyze-btn { background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 6px 12px; font-size: 0.8rem; cursor: pointer; color: #718096; }
+#reanalyze-btn:hover { border-color: #667eea; color: #667eea; }
+
+.recipe-card {
+  border: 1px solid #e2e8f0; border-radius: 12px; padding: 18px;
+  margin-bottom: 14px; position: relative;
+}
+.recipe-card h3 { font-size: 1rem; margin-bottom: 8px; color: #2d3748; padding-right: 36px; }
+.section-label { font-size: 0.72rem; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.05em; margin: 10px 0 4px; }
+.recipe-card p, .recipe-card li { font-size: 0.88rem; color: #4a5568; line-height: 1.65; }
+.recipe-card ol { padding-left: 18px; }
+.card-actions { display: flex; gap: 8px; margin-top: 14px; }
+.save-btn {
+  flex: 1; padding: 8px; border: none; border-radius: 8px;
+  font-size: 0.83rem; font-weight: 600; cursor: pointer;
+  background: linear-gradient(135deg, #48bb78, #38a169); color: #fff;
+}
+.save-btn.saved { background: #e2e8f0; color: #718096; cursor: default; }
+.fav-btn { background: none; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; font-size: 1rem; cursor: pointer; }
+
+/* 나의 레시피 */
+.my-recipe-card {
+  border: 1px solid #c6f6d5; border-radius: 12px; padding: 18px;
+  margin-bottom: 14px; background: #f0fff4; position: relative;
+}
+.my-recipe-card h3 { font-size: 1rem; color: #2d3748; margin-bottom: 6px; padding-right: 36px; }
+.my-recipe-card .meta { font-size: 0.78rem; color: #a0aec0; margin-bottom: 10px; }
+.del-btn { position: absolute; top: 14px; right: 14px; background: none; border: none; cursor: pointer; font-size: 1rem; color: #fc8181; }
+.del-btn:hover { color: #e53e3e; }
+.empty-state { text-align: center; padding: 40px 20px; color: #a0aec0; font-size: 0.9rem; }
+.empty-state .big { font-size: 2.5rem; margin-bottom: 10px; }
+
+/* 대시보드 */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.stat-card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); text-align: center; }
+.stat-card .stat-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.stat-card .stat-num { font-size: 2rem; font-weight: 700; color: #667eea; line-height: 1; }
+.stat-card .stat-label { font-size: 0.8rem; color: #718096; margin-top: 4px; }
+.history-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f0f4f8; }
+.history-item:last-child { border-bottom: none; }
+.history-dot { width: 8px; height: 8px; border-radius: 50%; background: #667eea; flex-shrink: 0; }
+.history-text { font-size: 0.87rem; color: #4a5568; flex: 1; }
+.history-time { font-size: 0.78rem; color: #a0aec0; }
+
+/* 스피너 */
+.spinner { display: inline-block; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 7px; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 토스트 */
+.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #2d3748; color: #fff; padding: 11px 20px; border-radius: 10px; font-size: 0.88rem; z-index: 999; opacity: 0; transition: opacity 0.3s; max-width: 90vw; text-align: center; word-break: keep-all; }
+.toast.show { opacity: 1; }
+.toast.error { background: #e53e3e; }
+
+@media (max-width: 480px) {
+  .nav-item { padding: 6px 10px; font-size: 0.8rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+  .stat-card { padding: 14px; }
+  .stat-card .stat-num { font-size: 1.6rem; }
+}
+@media (max-width: 375px) {
+  .auth-box { padding: 28px 20px; }
+  .card { padding: 16px; }
+  .nav-inner { padding: 0 10px; }
+  .nav-logo { font-size: 1rem; }
+  .stats-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<!-- ── 인증 화면 ── -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <h1>🧊 냉장고 레시피</h1>
+    <p class="sub">AI가 냉장고 재료로 레시피를 추천해드려요</p>
+    <div class="auth-tabs">
+      <div class="auth-tab active" id="tab-login" onclick="switchTab('login')">로그인</div>
+      <div class="auth-tab" id="tab-signup" onclick="switchTab('signup')">회원가입</div>
+    </div>
+    <div id="login-form">
+      <div class="field"><label>아이디</label><input type="text" id="login-id" placeholder="아이디 입력"></div>
+      <div class="field"><label>비밀번호</label><input type="password" id="login-pw" placeholder="비밀번호 입력"></div>
+      <button class="auth-btn" onclick="doLogin()">로그인</button>
+    </div>
+    <div id="signup-form" style="display:none;">
+      <div class="field"><label>아이디</label><input type="text" id="signup-id" placeholder="사용할 아이디 입력"></div>
+      <div class="field"><label>비밀번호</label><input type="password" id="signup-pw" placeholder="비밀번호 (4자 이상)"></div>
+      <div class="field"><label>닉네임</label><input type="text" id="signup-nick" placeholder="표시될 이름"></div>
+      <button class="auth-btn" onclick="doSignup()">회원가입</button>
+    </div>
+    <p class="auth-error" id="auth-error"></p>
+  </div>
+</div>
+
+<!-- ── 메인 앱 ── -->
+<div id="app-screen">
+  <nav>
+    <div class="nav-inner">
+      <span class="nav-logo">🧊 냉장고 레시피</span>
+      <div class="nav-menu">
+        <button class="nav-item active" onclick="showPage('generate')">레시피 생성</button>
+        <button class="nav-item" onclick="showPage('myrecipes')">나의 레시피</button>
+        <button class="nav-item" onclick="showPage('dashboard')">대시보드</button>
+      </div>
+      <div class="nav-user">
+        <span id="nav-username"></span>
+        <button onclick="doLogout()">로그아웃</button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 레시피 생성 페이지 -->
+  <div class="page active" id="page-generate">
+    <div class="card">
+      <h2>📷 냉장고 사진 업로드</h2>
+      <div id="drop-zone">
+        <div class="icon">📂</div>
+        <p><strong>클릭하거나 사진을 여기에 끌어다 놓으세요</strong></p>
+        <p style="margin-top:6px;">JPG, PNG 지원</p>
+      </div>
+      <input type="file" id="file-input" accept="image/*">
+      <div id="preview-wrap">
+        <img id="preview" alt="미리보기">
+        <br><button id="change-btn">다른 사진 선택</button>
+      </div>
+      <button class="btn btn-primary" id="analyze-btn" disabled>🔍 재료 인식하기</button>
+      <button class="btn btn-demo" id="demo-btn">🧪 데모 모드로 테스트 (API 없이)</button>
+    </div>
+
+    <div class="card" id="ingredient-section">
+      <h2>🥕 인식된 재료</h2>
+      <div id="tags"></div>
+      <div id="add-row">
+        <input type="text" id="add-input" placeholder="재료 직접 추가...">
+        <button id="add-btn">추가</button>
+      </div>
+      <button class="btn btn-secondary" id="recipe-btn">🍳 레시피 추천받기</button>
+    </div>
+
+    <div class="card" id="recipe-section">
+      <div class="recipe-header">
+        <h2>📋 추천 레시피</h2>
+        <button id="reanalyze-btn">🔄 재추천</button>
+      </div>
+      <div id="recipe-list"></div>
+    </div>
+  </div>
+
+  <!-- 나의 레시피 페이지 -->
+  <div class="page" id="page-myrecipes">
+    <div class="card">
+      <h2>📚 나의 레시피</h2>
+      <div id="my-recipe-list"></div>
+    </div>
+  </div>
+
+  <!-- 대시보드 페이지 -->
+  <div class="page" id="page-dashboard">
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🍳</div>
+        <div class="stat-num" id="stat-recipes">0</div>
+        <div class="stat-label">저장한 레시피</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">🥕</div>
+        <div class="stat-num" id="stat-ingredients">0</div>
+        <div class="stat-label">인식한 재료</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📸</div>
+        <div class="stat-num" id="stat-scans">0</div>
+        <div class="stat-label">냉장고 스캔</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon">📅</div>
+        <div class="stat-num" id="stat-days" style="font-size:1.2rem;"></div>
+        <div class="stat-label">가입일</div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>🕒 최근 활동</h2>
+      <div id="activity-list"></div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── 스토리지 키 ──
+const USERS_KEY  = 'fridge_users';
+const SESSION_KEY = 'fridge_session';
+const RECIPES_KEY = 'fridge_recipes';
+const STATS_KEY  = 'fridge_stats';
+const API_KEY_STORE = 'openrouter_api_key';
+const ACTIVITY_KEY = 'fridge_activity';
+
+const BASE_URL    = 'https://openrouter.ai/api/v1/chat/completions';
+const TEXT_MODEL  = 'qwen/qwen3.6-plus:free';
+const VISION_MODEL = 'google/gemma-3-27b-it:free';
+
+let currentUser = null;
+let imageBase64 = '';
+let ingredients = [];
+let API_KEY = localStorage.getItem(API_KEY_STORE) || '';
+
+// ── 인증 ──
+function getUsers() { return JSON.parse(localStorage.getItem(USERS_KEY) || '{}'); }
+function saveUsers(u) { localStorage.setItem(USERS_KEY, JSON.stringify(u)); }
+
+function switchTab(tab) {
+  document.getElementById('login-form').style.display  = tab === 'login'  ? '' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? '' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',  tab === 'login');
+  document.getElementById('tab-signup').classList.toggle('active', tab === 'signup');
+  document.getElementById('auth-error').textContent = '';
+}
+
+function authError(msg) { document.getElementById('auth-error').textContent = msg; }
+
+function doLogin() {
+  const id = document.getElementById('login-id').value.trim();
+  const pw = document.getElementById('login-pw').value;
+  if (!id || !pw) { authError('아이디와 비밀번호를 입력해주세요.'); return; }
+  const users = getUsers();
+  if (!users[id] || users[id].pw !== btoa(pw)) { authError('아이디 또는 비밀번호가 틀렸어요.'); return; }
+  users[id].lastLogin = new Date().toISOString();
+  saveUsers(users);
+  sessionStart(id, users[id]);
+}
+
+function doSignup() {
+  const id   = document.getElementById('signup-id').value.trim();
+  const pw   = document.getElementById('signup-pw').value;
+  const nick = document.getElementById('signup-nick').value.trim();
+  if (!id || !pw || !nick) { authError('모든 항목을 입력해주세요.'); return; }
+  if (pw.length < 4)       { authError('비밀번호는 4자 이상이어야 해요.'); return; }
+  const users = getUsers();
+  if (users[id])           { authError('이미 사용 중인 아이디예요.'); return; }
+  users[id] = { pw: btoa(pw), nick, joinedAt: new Date().toISOString(), lastLogin: new Date().toISOString() };
+  saveUsers(users);
+  // 초기 통계 생성
+  localStorage.setItem(STATS_KEY + '_' + id, JSON.stringify({ recipes: 0, ingredients: 0, scans: 0 }));
+  localStorage.setItem(ACTIVITY_KEY + '_' + id, JSON.stringify([]));
+  sessionStart(id, users[id]);
+  showToast('가입을 환영합니다, ' + nick + '님!');
+}
+
+function sessionStart(id, info) {
+  currentUser = { id, ...info };
+  localStorage.setItem(SESSION_KEY, id);
+  if (!API_KEY) {
+    API_KEY = prompt('OpenRouter API 키를 입력하세요 (없으면 데모 모드만 사용 가능):')?.trim() || '';
+    if (API_KEY) localStorage.setItem(API_KEY_STORE, API_KEY);
+  }
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display  = 'block';
+  document.getElementById('nav-username').textContent   = info.nick + '님';
+  refreshDashboard();
+}
+
+function doLogout() {
+  localStorage.removeItem(SESSION_KEY);
+  currentUser = null;
+  document.getElementById('app-screen').style.display  = 'none';
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('login-id').value = '';
+  document.getElementById('login-pw').value = '';
+}
+
+// ── 페이지 전환 ──
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const idx = { generate: 0, myrecipes: 1, dashboard: 2 }[name];
+  document.querySelectorAll('.nav-item')[idx]?.classList.add('active');
+  if (name === 'myrecipes') renderMyRecipes();
+  if (name === 'dashboard') refreshDashboard();
+}
+
+// ── 이미지 업로드 ──
+const dropZone  = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('dragover');
+  if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadImage(fileInput.files[0]); });
+document.getElementById('change-btn').addEventListener('click', () => fileInput.click());
+
+function loadImage(file) {
+  if (!file.type.startsWith('image/')) { showToast('이미지 파일만 업로드할 수 있어요.', true); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    imageBase64 = e.target.result.split(',')[1];
+    document.getElementById('preview').src = e.target.result;
+    document.getElementById('preview-wrap').style.display = 'block';
+    dropZone.style.display = 'none';
+    document.getElementById('analyze-btn').disabled = false;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ── 재료 인식 ──
+document.getElementById('analyze-btn').addEventListener('click', async () => {
+  const btn = document.getElementById('analyze-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>재료 인식 중...';
+  try {
+    const res = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: VISION_MODEL,
+        messages: [{ role: 'user', content: [
+          { type: 'image_url', image_url: { url: `data:image/jpeg;base64,${imageBase64}` } },
+          { type: 'text', text: '이 냉장고 사진에서 보이는 식재료를 한국어로 목록만 나열해줘. 각 재료를 줄바꿈으로 구분하고 "- "으로 시작해줘. 다른 설명 없이 재료 목록만 출력해.' }
+        ]}]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    const text = data.choices[0].message.content;
+    ingredients = text.split('\n').map(l => l.replace(/^[-*•]\s*/, '').trim()).filter(l => l.length > 0);
+    renderTags();
+    document.getElementById('ingredient-section').style.display = 'block';
+    document.getElementById('ingredient-section').scrollIntoView({ behavior: 'smooth' });
+    addStat('ingredients', ingredients.length);
+    addStat('scans', 1);
+    logActivity('📸 냉장고 스캔 — 재료 ' + ingredients.length + '개 인식');
+  } catch (err) {
+    showToast(friendlyError(err.message), true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🔍 재료 인식하기';
+  }
+});
+
+// ── 태그 ──
+function renderTags() {
+  const c = document.getElementById('tags');
+  c.innerHTML = '';
+  ingredients.forEach((ing, i) => {
+    const t = document.createElement('span');
+    t.className = 'tag';
+    t.innerHTML = `${escHtml(ing)} <button onclick="removeIngredient(${i})">✕</button>`;
+    c.appendChild(t);
+  });
+}
+function removeIngredient(i) { ingredients.splice(i, 1); renderTags(); }
+
+document.getElementById('add-btn').addEventListener('click', addIngredient);
+document.getElementById('add-input').addEventListener('keydown', e => { if (e.key === 'Enter') addIngredient(); });
+function addIngredient() {
+  const v = document.getElementById('add-input').value.trim();
+  if (!v) return;
+  ingredients.push(v); renderTags();
+  document.getElementById('add-input').value = '';
+}
+
+// ── 레시피 추천 ──
+document.getElementById('recipe-btn').addEventListener('click', getRecipes);
+document.getElementById('reanalyze-btn').addEventListener('click', getRecipes);
+
+async function getRecipes() {
+  if (!ingredients.length) { showToast('재료를 1개 이상 추가해주세요.'); return; }
+  const btn = document.getElementById('recipe-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>레시피 추천 중...';
+  try {
+    const res = await fetch(BASE_URL, {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${API_KEY}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: TEXT_MODEL,
+        messages: [{ role: 'user', content:
+          `재료: ${ingredients.join(', ')}\n\n이 재료로 만들 수 있는 한식 레시피 3가지를 아래 형식으로 알려줘:\n\n## 레시피 이름\n**재료:** 재료1, 재료2\n**조리순서:**\n1. 단계\n2. 단계\n\n다른 설명 없이 3개의 레시피만 출력해.`
+        }]
+      })
+    });
+    const data = await res.json();
+    if (data.error) throw new Error(data.error.message);
+    renderRecipes(data.choices[0].message.content);
+    document.getElementById('recipe-section').style.display = 'block';
+    document.getElementById('recipe-section').scrollIntoView({ behavior: 'smooth' });
+    logActivity('🍳 레시피 추천 — ' + ingredients.join(', '));
+  } catch (err) {
+    showToast(friendlyError(err.message), true);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '🍳 레시피 추천받기';
+  }
+}
+
+function renderRecipes(text) {
+  const list = document.getElementById('recipe-list');
+  list.innerHTML = '';
+  const blocks = text.split(/\n##\s+/).map(b => b.replace(/^#+\s*/, '')).filter(b => b.trim());
+  const saved = getSavedRecipes().map(r => r.title);
+
+  blocks.forEach((block, i) => {
+    const lines = block.trim().split('\n');
+    const title = lines[0].trim();
+    const body  = lines.slice(1).join('\n');
+    const ingMatch   = body.match(/\*\*재료[:：]?\*\*\s*([^\n]+)/);
+    const stepsMatch = body.match(/\*\*조리순서[:：]?\*\*\s*([\s\S]*)/);
+    const isSaved = saved.includes(title);
+
+    const card = document.createElement('div');
+    card.className = 'recipe-card';
+    card.innerHTML = `
+      <h3>${i + 1}. ${escHtml(title)}</h3>
+      ${ingMatch   ? `<div class="section-label">재료</div><p>${escHtml(ingMatch[1].trim())}</p>` : ''}
+      ${stepsMatch ? `<div class="section-label">조리순서</div><ol>${parseSteps(stepsMatch[1])}</ol>` : ''}
+      <div class="card-actions">
+        <button class="save-btn${isSaved ? ' saved' : ''}" onclick="saveRecipe(this,'${escAttr(title)}',\`${escAttr(block)}\`)">
+          ${isSaved ? '✅ 저장됨' : '💾 저장'}
+        </button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+}
+
+// ── 나의 레시피 ──
+function getSavedRecipes() {
+  if (!currentUser) return [];
+  return JSON.parse(localStorage.getItem(RECIPES_KEY + '_' + currentUser.id) || '[]');
+}
+function saveSavedRecipes(arr) {
+  localStorage.setItem(RECIPES_KEY + '_' + currentUser.id, JSON.stringify(arr));
+}
+
+function saveRecipe(btn, title, block) {
+  if (btn.classList.contains('saved')) return;
+  const arr = getSavedRecipes();
+  arr.unshift({ title, block, savedAt: new Date().toISOString() });
+  saveSavedRecipes(arr);
+  btn.textContent = '✅ 저장됨';
+  btn.classList.add('saved');
+  addStat('recipes', 1);
+  logActivity('💾 레시피 저장 — ' + title);
+  showToast('레시피가 저장되었습니다!');
+}
+
+function renderMyRecipes() {
+  const arr = getSavedRecipes();
+  const list = document.getElementById('my-recipe-list');
+  if (!arr.length) {
+    list.innerHTML = '<div class="empty-state"><div class="big">📭</div>저장된 레시피가 없어요.<br>레시피 생성 후 저장 버튼을 눌러보세요.</div>';
+    return;
+  }
+  list.innerHTML = '';
+  arr.forEach((r, i) => {
+    const lines = r.block.trim().split('\n');
+    const body  = lines.slice(1).join('\n');
+    const ingMatch   = body.match(/\*\*재료[:：]?\*\*\s*([^\n]+)/);
+    const stepsMatch = body.match(/\*\*조리순서[:：]?\*\*\s*([\s\S]*)/);
+    const date = new Date(r.savedAt).toLocaleDateString('ko-KR');
+
+    const card = document.createElement('div');
+    card.className = 'my-recipe-card';
+    card.innerHTML = `
+      <button class="del-btn" onclick="deleteRecipe(${i})" title="삭제">🗑</button>
+      <h3>${escHtml(r.title)}</h3>
+      <div class="meta">저장일: ${date}</div>
+      ${ingMatch   ? `<div class="section-label">재료</div><p>${escHtml(ingMatch[1].trim())}</p>` : ''}
+      ${stepsMatch ? `<div class="section-label">조리순서</div><ol>${parseSteps(stepsMatch[1])}</ol>` : ''}
+    `;
+    list.appendChild(card);
+  });
+}
+
+function deleteRecipe(i) {
+  const arr = getSavedRecipes();
+  arr.splice(i, 1);
+  saveSavedRecipes(arr);
+  addStat('recipes', -1);
+  renderMyRecipes();
+  showToast('레시피를 삭제했어요.');
+}
+
+// ── 대시보드 ──
+function getStats() {
+  if (!currentUser) return { recipes: 0, ingredients: 0, scans: 0 };
+  return JSON.parse(localStorage.getItem(STATS_KEY + '_' + currentUser.id) || '{"recipes":0,"ingredients":0,"scans":0}');
+}
+function addStat(key, delta) {
+  if (!currentUser) return;
+  const s = getStats();
+  s[key] = Math.max(0, (s[key] || 0) + delta);
+  localStorage.setItem(STATS_KEY + '_' + currentUser.id, JSON.stringify(s));
+}
+function logActivity(text) {
+  if (!currentUser) return;
+  const k = ACTIVITY_KEY + '_' + currentUser.id;
+  const arr = JSON.parse(localStorage.getItem(k) || '[]');
+  arr.unshift({ text, time: new Date().toISOString() });
+  if (arr.length > 20) arr.length = 20;
+  localStorage.setItem(k, JSON.stringify(arr));
+}
+function refreshDashboard() {
+  if (!currentUser) return;
+  const s = getStats();
+  document.getElementById('stat-recipes').textContent     = s.recipes     || 0;
+  document.getElementById('stat-ingredients').textContent = s.ingredients || 0;
+  document.getElementById('stat-scans').textContent       = s.scans       || 0;
+  const joined = new Date(currentUser.joinedAt);
+  document.getElementById('stat-days').textContent = joined.toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' });
+
+  const acts = JSON.parse(localStorage.getItem(ACTIVITY_KEY + '_' + currentUser.id) || '[]');
+  const al = document.getElementById('activity-list');
+  if (!acts.length) {
+    al.innerHTML = '<div class="empty-state" style="padding:20px 0;">아직 활동 기록이 없어요.</div>';
+    return;
+  }
+  al.innerHTML = acts.slice(0, 8).map(a => {
+    const t = new Date(a.time);
+    const timeStr = t.toLocaleString('ko-KR', { month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+    return `<div class="history-item"><div class="history-dot"></div><div class="history-text">${escHtml(a.text)}</div><div class="history-time">${timeStr}</div></div>`;
+  }).join('');
+}
+
+// ── 데모 모드 ──
+const DEMO_INGREDIENTS = ['당근', '달걀', '우유', '양파', '마늘', '두부', '김치', '대파'];
+const DEMO_RECIPES = `## 달걀찜
+**재료:** 달걀, 우유, 대파, 소금
+**조리순서:**
+1. 달걀 3개를 그릇에 풀고 우유 50ml를 넣어 잘 섞는다.
+2. 소금으로 간을 맞추고 대파를 잘게 썰어 넣는다.
+3. 냄비에 물을 끓이고 그릇을 올려 약불에서 15분 쪄낸다.
+4. 젓가락으로 찔러보아 맑은 즙이 나오면 완성.
+
+## 김치볶음밥
+**재료:** 김치, 달걀, 양파, 대파, 참기름
+**조리순서:**
+1. 김치를 먹기 좋은 크기로 썰고 양파는 잘게 다진다.
+2. 팬에 기름을 두르고 양파를 먼저 볶다가 김치를 넣어 함께 볶는다.
+3. 밥을 넣고 강불에서 볶은 뒤 달걀 프라이를 올린다.
+4. 참기름과 대파를 뿌려 마무리한다.
+
+## 두부된장찌개
+**재료:** 두부, 양파, 마늘, 대파, 된장
+**조리순서:**
+1. 두부는 깍둑썰기하고 양파와 마늘은 편으로 썬다.
+2. 냄비에 물 500ml를 붓고 된장 2큰술을 풀어 끓인다.
+3. 양파와 마늘을 넣고 5분간 끓인 뒤 두부를 넣는다.
+4. 약불에서 10분 더 끓이고 대파를 넣어 완성한다.`;
+
+document.getElementById('demo-btn').addEventListener('click', () => {
+  document.getElementById('preview').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="400" height="220" style="background:#e2e8f0"><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" font-size="16" fill="#718096">🧊 냉장고 샘플 이미지 (데모)</text></svg>');
+  document.getElementById('preview-wrap').style.display = 'block';
+  dropZone.style.display = 'none';
+  ingredients = [...DEMO_INGREDIENTS];
+  renderTags();
+  document.getElementById('ingredient-section').style.display = 'block';
+  renderRecipes(DEMO_RECIPES);
+  document.getElementById('recipe-section').style.display = 'block';
+  addStat('ingredients', ingredients.length);
+  addStat('scans', 1);
+  logActivity('📸 냉장고 스캔 (데모) — 재료 ' + ingredients.length + '개 인식');
+  setTimeout(() => document.getElementById('ingredient-section').scrollIntoView({ behavior: 'smooth' }), 100);
+  showToast('데모 모드: 샘플 재료와 레시피가 로드되었습니다.');
+});
+
+// ── 유틸 ──
+function parseSteps(text) {
+  return text.trim().split('\n').filter(l => l.trim())
+    .map(l => `<li>${escHtml(l.replace(/^\d+\.\s*/, '').trim())}</li>`).join('');
+}
+function escHtml(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(s) {
+  return String(s).replace(/\\/g,'\\\\').replace(/`/g,'\\`').replace(/'/g,"\\'");
+}
+function friendlyError(msg) {
+  if (!msg) return '알 수 없는 오류가 발생했어요.';
+  if (msg.includes('429') || msg.includes('rate')) return '⏳ 모델이 일시적으로 바빠요. 잠시 후 다시 시도해주세요.';
+  if (msg.includes('401') || msg.includes('auth')) return '🔑 API 키가 유효하지 않아요.';
+  if (msg.includes('network') || msg.includes('fetch')) return '🌐 인터넷 연결을 확인해주세요.';
+  return msg;
+}
+let toastTimer;
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// ── 세션 복원 ──
+(function init() {
+  const savedId = localStorage.getItem(SESSION_KEY);
+  if (savedId) {
+    const users = getUsers();
+    if (users[savedId]) { sessionStart(savedId, users[savedId]); return; }
+  }
+  document.getElementById('auth-screen').style.display = 'flex';
+})();
+</script>
+</body>
+</html>

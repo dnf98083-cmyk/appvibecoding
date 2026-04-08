@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tasks</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Header -->
+    <header>
+      <h1>✅ My Tasks</h1>
+      <div class="header-right">
+        <span id="today-date" class="date"></span>
+        <label class="theme-toggle" title="다크 모드 전환">
+          <input type="checkbox" id="theme-switch">
+          <span class="toggle-track"><span class="toggle-thumb"></span></span>
+        </label>
+      </div>
+    </header>
+
+    <!-- Input area -->
+    <div class="input-area">
+      <input
+        type="text"
+        id="task-input"
+        placeholder="새 할 일을 입력하세요... (Alt+N)"
+        autocomplete="off"
+      >
+      <select id="category-select">
+        <option value="work">업무</option>
+        <option value="personal">개인</option>
+        <option value="study">공부</option>
+      </select>
+      <button id="add-btn">추가</button>
+    </div>
+
+    <!-- Filter buttons -->
+    <div class="filter-bar">
+      <button class="filter-btn active" data-filter="all">전체 (Alt+1)</button>
+      <button class="filter-btn" data-filter="work">업무 (Alt+2)</button>
+      <button class="filter-btn" data-filter="personal">개인 (Alt+3)</button>
+      <button class="filter-btn" data-filter="study">공부 (Alt+4)</button>
+    </div>
+
+    <!-- Toolbar: sort + actions -->
+    <div class="toolbar">
+      <select id="sort-select">
+        <option value="default">미완료 우선</option>
+        <option value="newest">최신순</option>
+        <option value="oldest">오래된순</option>
+        <option value="category">카테고리순</option>
+        <option value="alpha">가나다순</option>
+      </select>
+      <div class="toolbar-actions">
+        <button id="clear-done-btn" class="toolbar-btn danger">완료 삭제</button>
+        <button id="export-btn" class="toolbar-btn">내보내기</button>
+        <button id="import-btn" class="toolbar-btn">가져오기</button>
+        <input type="file" id="import-file" accept=".json">
+      </div>
+    </div>
+
+    <!-- Stats panel -->
+    <div class="stats-panel" id="stats-panel"></div>
+
+    <!-- Task list -->
+    <ul id="task-list"></ul>
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state">
+      <p>+ 버튼으로 첫 번째 할 일을 추가해보세요</p>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

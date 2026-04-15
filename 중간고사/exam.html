@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>바이브코딩 중간고사 기출문제</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Noto Sans KR', sans-serif; background: #f0f4f8; color: #1a202c; min-height: 100vh; }
+  .screen { display: none; padding: 20px; max-width: 800px; margin: 0 auto; }
+  .screen.active { display: block; }
+
+  /* HOME */
+  #s-home { text-align: center; padding-top: 60px; }
+  #s-home h1 { font-size: 2rem; color: #2b6cb0; margin-bottom: 8px; }
+  #s-home p { color: #718096; margin-bottom: 40px; }
+  .home-btns { display: flex; flex-direction: column; gap: 12px; max-width: 360px; margin: 0 auto; }
+  .btn { padding: 14px 28px; border: none; border-radius: 10px; font-size: 1rem; cursor: pointer; font-weight: 600; transition: transform .15s, box-shadow .15s; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.15); }
+  .btn-primary { background: #3182ce; color: #fff; }
+  .btn-secondary { background: #fff; color: #2d3748; border: 2px solid #e2e8f0; }
+  .btn-wrong { background: #e53e3e; color: #fff; }
+  .btn-sm { padding: 8px 18px; font-size: .85rem; }
+  .score-badge { display: inline-block; background: #ebf8ff; color: #2b6cb0; border-radius: 20px; padding: 4px 14px; font-size: .85rem; margin: 4px; }
+
+  /* WEEKS */
+  #s-weeks h2 { font-size: 1.5rem; color: #2b6cb0; margin-bottom: 20px; }
+  .week-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 14px; }
+  .week-card { background: #fff; border-radius: 12px; padding: 18px; cursor: pointer; border: 2px solid transparent; transition: all .2s; }
+  .week-card:hover { border-color: #3182ce; transform: translateY(-2px); }
+  .week-card h3 { font-size: 1rem; color: #2d3748; margin-bottom: 6px; }
+  .week-card .wk-num { font-size: .8rem; color: #3182ce; font-weight: 700; margin-bottom: 8px; }
+  .week-card .score-line { font-size: .8rem; color: #718096; }
+  .back-btn { margin-bottom: 16px; }
+
+  /* QUIZ */
+  #s-quiz { padding-top: 20px; }
+  .quiz-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .quiz-header span { font-size: .9rem; color: #718096; }
+  .progress-bar { height: 6px; background: #e2e8f0; border-radius: 3px; margin-bottom: 24px; }
+  .progress-fill { height: 100%; background: #3182ce; border-radius: 3px; transition: width .4s; }
+  .q-type-badge { font-size: .75rem; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 12px; display: inline-block; }
+  .badge-multiple { background: #ebf8ff; color: #2b6cb0; }
+  .badge-short { background: #faf5ff; color: #6b46c1; }
+  .q-text { font-size: 1.1rem; font-weight: 600; line-height: 1.6; margin-bottom: 20px; }
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+  .opt-btn { text-align: left; padding: 14px 18px; background: #fff; border: 2px solid #e2e8f0; border-radius: 10px; font-size: .95rem; cursor: pointer; transition: all .2s; line-height: 1.5; }
+  .opt-btn:hover:not(:disabled) { border-color: #3182ce; background: #ebf8ff; }
+  .opt-btn.correct { border-color: #38a169; background: #f0fff4; color: #276749; }
+  .opt-btn.wrong-sel { border-color: #e53e3e; background: #fff5f5; color: #c53030; }
+  .opt-btn.show-correct { border-color: #38a169; background: #f0fff4; }
+  .short-area { width: 100%; min-height: 80px; border: 2px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: .95rem; resize: vertical; font-family: inherit; }
+  .short-area:focus { outline: none; border-color: #3182ce; }
+  .explanation { background: #fffbeb; border-left: 4px solid #f6ad55; padding: 14px; border-radius: 0 8px 8px 0; margin-bottom: 16px; font-size: .9rem; line-height: 1.6; }
+  .explanation strong { color: #c05621; }
+  .answer-reveal { background: #f0fff4; border: 1px solid #9ae6b4; border-radius: 8px; padding: 12px; margin-bottom: 12px; font-size: .9rem; }
+  .self-grade { display: flex; gap: 10px; margin-bottom: 12px; }
+  .btn-correct-self { background: #38a169; color: #fff; }
+  .btn-wrong-self { background: #e53e3e; color: #fff; }
+
+  /* RESULT */
+  #s-result { text-align: center; padding-top: 40px; }
+  #s-result h2 { font-size: 1.8rem; margin-bottom: 8px; }
+  .grade-circle { width: 120px; height: 120px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; font-weight: 700; margin: 20px auto; }
+  .grade-A { background: #f0fff4; color: #276749; border: 4px solid #38a169; }
+  .grade-B { background: #ebf8ff; color: #2b6cb0; border: 4px solid #3182ce; }
+  .grade-C { background: #faf5ff; color: #553c9a; border: 4px solid #805ad5; }
+  .grade-D { background: #fffbeb; color: #c05621; border: 4px solid #f6ad55; }
+  .grade-F { background: #fff5f5; color: #c53030; border: 4px solid #e53e3e; }
+  .result-score { font-size: 1.2rem; color: #4a5568; margin-bottom: 24px; }
+  .wrong-list { text-align: left; background: #fff; border-radius: 12px; padding: 20px; margin: 20px 0; }
+  .wrong-list h3 { font-size: 1rem; color: #e53e3e; margin-bottom: 12px; }
+  .wrong-item { padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: .9rem; color: #4a5568; }
+  .result-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+  @media(max-width:500px) {
+    #s-home h1 { font-size: 1.5rem; }
+    .q-text { font-size: 1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="s-home" class="screen active">
+  <h1>바이브코딩 중간고사</h1>
+  <p>1~7주차 기출문제 · 총 35문항</p>
+  <div id="home-stats" style="margin-bottom:28px;"></div>
+  <div class="home-btns">
+    <button class="btn btn-primary" onclick="startAll()">전체 문제 풀기 (35문항)</button>
+    <button class="btn btn-secondary" onclick="showWeeks()">주차별로 풀기</button>
+    <button class="btn btn-wrong" onclick="startWrong()">틀린 문제만 풀기</button>
+  </div>
+</div>
+
+<!-- WEEKS -->
+<div id="s-weeks" class="screen">
+  <button class="btn btn-secondary btn-sm back-btn" onclick="goHome()">← 홈으로</button>
+  <h2>주차 선택</h2>
+  <div class="week-grid" id="week-grid"></div>
+</div>
+
+<!-- QUIZ -->
+<div id="s-quiz" class="screen">
+  <button class="btn btn-secondary btn-sm" onclick="goHome()" style="margin-bottom:12px">← 홈으로</button>
+  <div class="quiz-header">
+    <span id="q-counter">1 / 35</span>
+    <span id="q-week-label">1주차</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div id="q-type-badge" class="q-type-badge badge-multiple">객관식</div>
+  <div id="q-text" class="q-text"></div>
+  <div id="q-options" class="options"></div>
+  <textarea id="q-short" class="short-area" placeholder="답을 입력하세요..." style="display:none"></textarea>
+  <div id="explanation-box" class="explanation" style="display:none"></div>
+  <div id="answer-reveal-box" class="answer-reveal" style="display:none"></div>
+  <div id="self-grade-box" class="self-grade" style="display:none">
+    <button class="btn btn-correct-self btn-sm" onclick="selfGrade(true)">맞음</button>
+    <button class="btn btn-wrong-self btn-sm" onclick="selfGrade(false)">틀림</button>
+  </div>
+  <button id="btn-check" class="btn btn-primary" onclick="checkAnswer()" style="display:none">확인</button>
+  <button id="btn-next" class="btn btn-primary" onclick="nextQ()" style="display:none;margin-top:10px">다음 →</button>
+</div>
+
+<!-- RESULT -->
+<div id="s-result" class="screen">
+  <h2>결과</h2>
+  <div id="grade-circle" class="grade-circle grade-A">A</div>
+  <div id="result-score" class="result-score"></div>
+  <div id="wrong-list" class="wrong-list" style="display:none">
+    <h3>틀린 문제</h3>
+    <div id="wrong-items"></div>
+  </div>
+  <div class="result-btns">
+    <button class="btn btn-secondary" onclick="retryQuiz()">다시 풀기</button>
+    <button class="btn btn-primary" onclick="goHome()">홈으로</button>
+  </div>
+</div>
+
+<script>
+const WEEKS = [{"week": 1, "title": "나의 첫 바이브 코딩", "questions": [{"id": "1-1", "type": "multiple", "question": "AI 어시스턴트의 발전 과정을 올바른 순서로 나열한 것은?", "options": ["① 뉴럴 네트워크 → 딥러닝 → 트랜스포머 → LLM", "② 딥러닝 → 뉴럴 네트워크 → LLM → 트랜스포머", "③ 트랜스포머 → 뉴럴 네트워크 → 딥러닝 → LLM", "④ LLM → 트랜스포머 → 딥러닝 → 뉴럴 네트워크"], "answer": "①", "explanation": "AI는 뉴럴 네트워크(1950s~) → 딥러닝(2010s~) → 트랜스포머(2017~) → LLM(2020~현재) 순서로 발전하였다."}, {"id": "1-2", "type": "multiple", "question": "다음 중 CLI 기반 바이브 코딩 도구(전용 모델형)의 특징으로 옳지 않은 것은?", "options": ["① 터미널에서 실행한다", "② GUI 없이 텍스트로만 소통한다", "③ 여러 AI 모델을 자유롭게 선택할 수 있다", "④ 프로젝트 파일을 직접 수정할 수 있다"], "answer": "③", "explanation": "전용 모델형 도구(Claude Code, Gemini CLI 등)는 자체 AI 모델만 사용한다. 여러 AI 모델을 선택할 수 있는 것은 모델 선택형 도구의 특징이다."}, {"id": "1-3", "type": "multiple", "question": "클로드(Claude)의 Artifacts 기능에 대한 설명으로 옳은 것은?", "options": ["① 코드를 파일로 저장하는 기능이다", "② AI가 생성한 코드의 실행 결과를 실시간으로 미리 볼 수 있는 작업 공간이다", "③ 다른 사용자의 코드를 가져오는 기능이다", "④ 오류를 자동으로 수정하는 디버깅 도구이다"], "answer": "②", "explanation": "Artifacts는 클로드가 생성한 코드의 실행 결과를 실시간으로 미리 볼 수 있는 작업 공간이다."}, {"id": "1-4", "type": "short", "question": "바이브 코딩(Vibe Coding) 도구는 두 가지 유형으로 나뉜다. 여러 AI를 선택할 수 있는 도구 유형과 자체 AI를 활용하는 도구 유형의 명칭을 각각 쓰시오.", "options": null, "answer": "모델 선택형 도구, 전용 모델형 도구", "explanation": "모델 선택형 도구(Cursor, Replit 등)는 여러 AI 모델 중 선택해 사용하고, 전용 모델형 도구(Claude Code, Gemini CLI 등)는 자체 AI 모델만 사용한다."}, {"id": "1-5", "type": "short", "question": "바이브 코딩의 기본 사이클 5단계를 순서대로 쓰시오.", "options": null, "answer": "아이디어 정의 → 프롬프트 작성 → 결과 확인 → 수정 요청 → 검토 및 기록", "explanation": "바이브 코딩은 반복 개선(Iteration)을 통해 진행된다. 각 단계를 반복하면서 점점 원하는 결과물에 가까워진다."}]}, {"week": 2, "title": "효과적인 프롬프트로 AI 200% 활용하기", "questions": [{"id": "2-1", "type": "multiple", "question": "다음 중 좋은 프롬프트의 3가지 조건이 아닌 것은?", "options": ["① 명확성: 원하는 결과를 구체적으로 전달한다", "② 구체성: 필요한 기능이나 조건을 세부적으로 지시한다", "③ 창의성: 결과물이 놀라움을 주도록 요구한다", "④ 맥락 제공: 왜 필요한지, 어떤 상황에서 활용되는지 알려 준다"], "answer": "③", "explanation": "좋은 프롬프트의 3가지 조건은 명확성, 구체성, 맥락 제공이다. 창의성은 해당되지 않는다."}, {"id": "2-2", "type": "multiple", "question": "4단계 포트폴리오 전략의 올바른 순서는?", "options": ["① 디자인 → 기본 틀 → 기능 → 점검", "② 기본 틀 → 디자인 → 기능 → 점검", "③ 기본 틀 → 기능 → 디자인 → 점검", "④ 기능 → 기본 틀 → 점검 → 디자인"], "answer": "③", "explanation": "4단계 전략은 뼈대(기본 틀) → 기능 → 디자인 → 점검 순서로 진행한다."}, {"id": "2-3", "type": "multiple", "question": "효과적인 프롬프트 작성법으로 옳지 않은 것은?", "options": ["① 5W1H 템플릿을 활용하여 체계적으로 질문한다", "② 모든 기능을 한 번에 요청하여 시간을 절약한다", "③ 각 섹션에 ID를 부여하여 개별 수정이 가능하도록 한다", "④ 구체적인 디자인 레퍼런스를 제공한다"], "answer": "②", "explanation": "한 번에 모든 기능을 요청하면 코드가 복잡해지고 확인하기 어렵다. 4단계 전략처럼 단계별로 요청하는 것이 좋다."}, {"id": "2-4", "type": "short", "question": "PRD(Product Requirements Document)란 무엇이며, 좋은 프롬프트와 어떤 공통점이 있는지 서술하시오.", "options": null, "answer": "PRD는 개발자들이 코딩에 앞서 작성하는 제품 기획서로, 무엇을 만들지 명확히 정의하고 프로젝트 목적, 요구사항, 구현 방법을 구체화한다. 좋은 프롬프트도 해야 할 일을 구체적으로 지시하고 왜 필요한지 설명하며 필요한 기능과 조건을 세부적으로 명시한다는 점에서 본질적으로 동일하다.", "explanation": "PRD와 좋은 프롬프트는 모두 5W1H 원칙을 기반으로 한다."}, {"id": "2-5", "type": "short", "question": "포트폴리오 웹페이지 제작 시 각 섹션에 고유한 ID를 부여하는 이유를 설명하시오.", "options": null, "answer": "고유한 섹션 ID를 부여하면 이후 수정 시 특정 섹션을 정확히 지목하여 AI에게 요청할 수 있다. 이를 통해 원하는 부분만 선택적으로 수정할 수 있고, AI가 기존 구조를 무시하는 것을 방지할 수 있다.", "explanation": "예를 들어 특정 ID로 지목하여 요청하면 다른 섹션을 건드리지 않고 해당 부분만 정확하게 수정할 수 있다."}]}, {"week": 3, "title": "클로드 코드 시작하기", "questions": [{"id": "3-1", "type": "multiple", "question": "클로드 코드를 설치하기 위해 필수적으로 먼저 설치해야 하는 두 가지 프로그램은?", "options": ["① Python과 Visual Studio Code", "② Node.js와 Git", "③ Docker와 Kubernetes", "④ Chrome과 Firefox"], "answer": "②", "explanation": "클로드 코드는 Node.js 기반으로 동작하므로 Node.js(LTS 버전)와 Git을 먼저 설치해야 한다."}, {"id": "3-2", "type": "multiple", "question": "CLAUDE.md 파일의 주요 역할이 아닌 것은?", "options": ["① 프로젝트 맥락을 자동으로 복원", "② 코딩 규칙과 명령어 저장", "③ 이전 대화 내용 전체 저장", "④ 클로드 코드가 시작할 때 자동으로 읽어들임"], "answer": "③", "explanation": "CLAUDE.md는 프로젝트 구조, 규칙, 명령어를 기록하는 설정 파일이다. 이전 대화 내용 전체를 저장하는 기능은 없다."}, {"id": "3-3", "type": "multiple", "question": "손글씨 인식 프로그램의 학습 지표에 대한 설명으로 옳은 것은?", "options": ["① accuracy는 낮을수록 성능이 좋다", "② loss는 높을수록 성능이 좋다", "③ accuracy는 높을수록, loss는 낮을수록 성능이 좋다", "④ 두 지표 모두 높을수록 성능이 좋다"], "answer": "③", "explanation": "accuracy(정확도)는 높을수록, loss(손실)는 낮을수록 모델 성능이 향상되고 있음을 의미한다."}, {"id": "3-4", "type": "short", "question": "CLAUDE.md를 자동으로 생성하는 명령어와 그 동작 방식을 설명하시오.", "options": null, "answer": "/init 명령어를 입력하면 클로드 코드가 현재 프로젝트 폴더의 파일과 구조를 자동 분석한 뒤, 분석 결과를 바탕으로 CLAUDE.md 파일을 생성하여 프로젝트 목적, 구조, 규칙을 문서화한다.", "explanation": "/init은 클로드 코드에서 제공하는 초기화 명령어로, 프로젝트 루트 폴더에서 실행해야 한다."}, {"id": "3-5", "type": "short", "question": "CLAUDE.md의 계층적 구조란 무엇인지 설명하고, 그 장점을 서술하시오.", "options": null, "answer": "계층적 구조는 루트 폴더에 전체 프로젝트에 적용되는 공통 규칙을 담은 CLAUDE.md를 두고, 각 하위 폴더에 해당 폴더에만 적용되는 특화 규칙을 담은 별도 CLAUDE.md를 두는 방식이다. 공통 규칙을 한 번만 작성하면서도 하위 프로젝트별로 서로 다른 규칙을 적용할 수 있어 일관성을 유지하면서 유연하게 관리할 수 있다.", "explanation": "예를 들어 루트 CLAUDE.md에는 전체 공통 코딩 스타일, 하위 폴더에는 각각 특화 규칙을 정의할 수 있다."}]}, {"week": 4, "title": "클로드 코드 실전 활용", "questions": [{"id": "4-1", "type": "multiple", "question": "다음 설명 중 틀린 것을 고르시오.", "options": ["① /compact는 대화 내용을 요약하여 토큰을 절약한다", "② auto-compact는 컨텍스트가 임계값에 도달하면 자동으로 실행된다", "③ 압축 후에도 CLAUDE.md와 프로젝트 파일은 유지된다", "④ Ctrl + R은 /context 명령어의 단축키이다"], "answer": "④", "explanation": "/context는 직접 입력하여 사용하는 명령어이며, Ctrl + R은 해당 단축키가 아니다. Shift + Tab은 자동 승인 모드 전환에 사용된다."}, {"id": "4-2", "type": "multiple", "question": "다음 설명 중 틀린 것을 고르시오.", "options": ["① 스크린 캡처한 이미지는 드래그앤드롭으로 클로드 코드에 전달할 수 있다", "② @ 기호를 사용하면 파일 검색 없이 즉시 프롬프트에 파일을 포함시킬 수 있다", "③ /config는 클로드 코드의 전역 설정만 변경할 수 있다", "④ /doctor는 설치 상태, 버전, 자동 업데이트 설정 상태를 확인할 수 있다"], "answer": "③", "explanation": "/config는 Auto-compact, Theme, Model 등 다양한 설정을 확인하고 변경하는 명령어로 전역 설정만이 아닌 현재 세션 설정도 관리한다."}, {"id": "4-3", "type": "multiple", "question": "할 일 관리 앱에서 새로고침 후에도 데이터가 사라지지 않도록 하기 위해 사용하는 기술은?", "options": ["① 서버 데이터베이스(MySQL)", "② 쿠키(Cookie)", "③ localStorage", "④ sessionStorage"], "answer": "③", "explanation": "localStorage는 브라우저에 데이터를 영구적으로 저장하는 Web Storage API로, 새로고침이나 브라우저 재시작 후에도 데이터가 유지된다."}, {"id": "4-4", "type": "short", "question": "단계별 프롬프트 전략에서 PRD를 5단계로 분해할 때, 각 단계의 명칭과 핵심 활동을 서술하시오.", "options": null, "answer": "Step 1: 기본 구조 및 핵심 기능 구현 (HTML/CSS/JS 파일 생성, CRUD 기능, localStorage 저장) / Step 2: 카테고리 기능 및 UI 개선 (카테고리 분류, 색상 태그, 필터 버튼) / Step 3: 진행률 대시보드 추가 (전체 진행률 프로그레스 바, 인라인 수정) / Step 4: 다크 모드 및 고급 기능 (다크/라이트 모드 토글, 키보드 단축키) / Step 5: 최종 완성 및 최적화 (JSON 내보내기/가져오기, 정렬 옵션, 성능 최적화)", "explanation": "단계별로 나누어 요청하면 각 단계마다 짧은 사이클을 반복하여 변경 위험을 줄이고 품질을 점진적으로 확보할 수 있다."}, {"id": "4-5", "type": "short", "question": "클로드 코드에서 세션을 재개하는 방법 2가지를 명령어와 함께 설명하고, 컨텍스트가 부족할 때 사용하는 명령어를 쓰시오.", "options": null, "answer": "세션 재개 방법 1: claude --resume 명령어로 이전 대화 목록을 불러와 원하는 세션을 선택하여 재개한다. / 세션 재개 방법 2: claude --continue (-c 옵션)로 가장 최근 대화를 자동으로 복구한다. / 컨텍스트 부족 시: /compact 명령어로 대화 기록을 요약하여 컨텍스트 공간을 확보한다.", "explanation": "세션은 클로드 코드에서 대화를 시작해 명령을 주고받는 동안 유지되는 상태이며, 터미널을 닫아도 자동 저장된다."}]}, {"week": 5, "title": "게임 제작으로 배우는 체계적인 개발과 관리", "questions": [{"id": "5-1", "type": "multiple", "question": "AI 할루시네이션(hallucination)에 대한 설명으로 옳지 않은 것은?", "options": ["① AI가 학습 데이터의 패턴을 기반으로 확률적으로 그럴듯한 문장을 생성하는 과정에서 발생한다.", "② 불명확한 정보로 인한 추론 오류가 원인 중 하나다.", "③ AI가 생성한 정보는 신뢰할 수 있는 출처와 교차 검증하여 대응할 수 있다.", "④ 할루시네이션은 사실 기반 콘텐츠보다 코드 생성에서 더 자주 발생한다."], "answer": "④", "explanation": "할루시네이션은 코드 생성보다 사실 기반 콘텐츠(퀴즈, 역사, 과학 등)에서 특히 문제가 된다."}, {"id": "5-2", "type": "multiple", "question": "/clear와 /compact 명령어를 비교한 설명 중 옳은 것은?", "options": ["① /clear는 대화 내용을 요약하여 압축하고 컨텍스트를 유지한다.", "② /compact는 대화 기록을 완전히 초기화하여 컨텍스트 윈도우를 비운다.", "③ /clear 실행 후에도 CLAUDE.md 파일은 유지된다.", "④ /compact 실행 후 CLAUDE.md 파일은 삭제된다."], "answer": "③", "explanation": "/clear는 세션 컨텍스트를 모두 지우지만 CLAUDE.md 파일 자체는 유지된다. /compact는 대화 내용을 요약하여 압축한다. 두 명령어 모두 CLAUDE.md를 삭제하지 않는다."}, {"id": "5-3", "type": "multiple", "question": "커스텀 명령어와 관련된 설명 중 옳지 않은 것은?", "options": ["① 커스텀 명령어는 마크다운(.md) 파일 형식으로 저장된다.", "② 프로젝트 명령어는 .claude/commands/ 폴더에 저장하며 해당 프로젝트에서만 사용할 수 있다.", "③ 커스텀 명령어를 생성한 후 즉시 /명령어명으로 실행할 수 있다.", "④ 전역 명령어는 ~/.claude/commands/ 폴더에 저장하며 모든 프로젝트에서 사용할 수 있다."], "answer": "③", "explanation": "커스텀 명령어를 생성하거나 수정한 후에는 /exit로 종료하고 claude 명령어로 재시작해야 새 명령어를 사용할 수 있다. 생성 즉시 실행되지 않는다."}, {"id": "5-4", "type": "short", "question": "커스텀 명령어에서 $ARGUMENTS, $1, $2 같은 기호를 무엇이라 부르며, 이를 사용하는 목적을 간략히 설명하시오.", "options": null, "answer": "플레이스홀더(placeholder). 명령어 실행 시 사용자가 입력한 인수(실제 값)로 자동 치환되어, 하나의 명령어로 다양한 대상을 유연하게 처리할 수 있게 해준다.", "explanation": "플레이스홀더는 인수가 들어갈 자리를 미리 표시하는 기호이다. $ARGUMENTS는 전체 인수, $1/$2는 첫 번째/두 번째 인수를 나타낸다."}, {"id": "5-5", "type": "short", "question": "상식 퀴즈 게임 제작 시 최상급 표현이 포함된 문제에서 발생할 수 있는 문제를 지적하고, CLAUDE.md에 이를 방지하기 위한 가이드라인을 어떻게 작성해야 하는지 설명하시오.", "options": null, "answer": "최상급 표현은 측정 기준이 명확하지 않으면 정답이 여러 개가 될 수 있어 할루시네이션 문제가 발생할 수 있다. CLAUDE.md에는 최상급 표현에 반드시 측정 기준과 시점을 명시하고, 논란 있는 내용은 주류 학설 기준으로 작성하고 출처를 확인하라는 교차 검증 가이드라인을 추가한다.", "explanation": "예를 들어 세계에서 가장 긴 강은 나일강과 아마존강 중 어느 쪽인지 논란이 있다. 반드시 기준을 명시해야 한다."}]}, {"week": 6, "title": "클로드 코드에 API 날개 달기", "questions": [{"id": "6-1", "type": "multiple", "question": "API 키(API key)를 안전하게 관리하는 방법으로 가장 적절하지 않은 것은?", "options": ["① .env 파일에 API 키를 저장한다.", "② .gitignore 파일에 .env를 추가하여 깃허브에 업로드되지 않도록 한다.", "③ 소스 코드 파일 안에 API 키를 직접 문자열로 입력(하드코딩)한다.", "④ 개인 로컬 컴퓨터의 프로젝트 폴더 안에서만 키를 참조한다."], "answer": "③", "explanation": "API 키를 소스 코드에 직접 하드코딩하면 코드 공유 시 키가 노출될 위험이 있다. 반드시 .env 파일에 저장하고 .gitignore로 보호해야 한다."}, {"id": "6-2", "type": "multiple", "question": "오픈라우터(OpenRouter)에 대한 설명 중 옳지 않은 것은?", "options": ["① 여러 AI 모델을 한 곳에서 비교하고 선택할 수 있는 API 통합 플랫폼이다.", "② 클로드, GPT, 라마(Llama) 등 다양한 AI 모델을 하나의 API 키로 사용할 수 있다.", "③ 무료 모델이 없으므로 반드시 유료 플랜을 구독해야 한다.", "④ Activity 메뉴에서 API 호출 기록과 사용한 모델명을 확인할 수 있다."], "answer": "③", "explanation": "오픈라우터는 무료 모델도 많아 학습 목적으로 충분히 활용 가능하다. Gemma 3 27B(free), Qwen 3.6 Plus(free) 등 무료 모델이 있다."}, {"id": "6-3", "type": "multiple", "question": "냉장고를 부탁해 앱(FridgeChef)의 3단계 PRD 개발 순서와 각 단계에서 사용하는 AI 모델을 바르게 연결한 것은?", "options": ["① 1단계: 레시피 생성(Qwen 3.6 Plus) -> 2단계: 이미지 인식(Gemma 3 27B) -> 3단계: 사용자 저장 기능", "② 1단계: 이미지 인식(Gemma 3 27B) -> 2단계: 레시피 생성(Qwen 3.6 Plus) -> 3단계: 사용자 프로필 및 저장 기능", "③ 1단계: 사용자 인증 -> 2단계: 이미지 인식(Gemma 3 27B) -> 3단계: 레시피 생성(Qwen 3.6 Plus)", "④ 1단계: 이미지 인식(Qwen 3.6 Plus) -> 2단계: 레시피 생성(Gemma 3 27B) -> 3단계: 배포"], "answer": "②", "explanation": "1단계는 Gemma 3 27B로 냉장고 이미지에서 재료를 인식하고, 2단계는 Qwen 3.6 Plus로 레시피를 생성하며, 3단계는 사용자 인증과 저장 기능을 구현한다."}, {"id": "6-4", "type": "short", "question": ".env 파일과 .gitignore 파일의 역할을 각각 설명하고, 두 파일이 함께 사용되어야 하는 이유를 서술하시오.", "options": null, "answer": ".env는 API 키 등 민감한 정보를 코드와 분리하여 저장하는 환경 변수 파일이고, .gitignore는 특정 파일(.env 등)이 깃허브에 업로드되지 않도록 제외하는 설정 파일이다. .env 파일만 있고 .gitignore에 등록하지 않으면 git push 시 API 키가 깃허브에 공개될 위험이 있으므로 두 파일을 함께 사용해야 안전하다.", "explanation": ".env에 API 키를 저장하면 코드 수정 없이 설정 변경이 가능하다. 반드시 두 파일을 함께 사용해야 코드와 민감 정보를 안전하게 분리 보호할 수 있다."}, {"id": "6-5", "type": "short", "question": "Streamlit이 전통적인 HTML/CSS/JS 웹 개발과 다른 점을 두 가지 이상 서술하시오.", "options": null, "answer": "Streamlit은 파이썬 코드만으로 웹 앱을 만들 수 있으며, 별도로 프런트엔드와 백엔드를 분리하지 않아도 된다. 데이터 시각화와 AI/ML 모델 시연에 특화되어 있으며, streamlit run 명령어로 간단히 실행할 수 있다.", "explanation": "전통적인 웹 개발은 HTML/CSS/JS로 프런트엔드, 별도 언어로 백엔드를 구성해야 한다. Streamlit은 파이썬 코드만으로 웹 인터페이스를 구성할 수 있다."}]}, {"week": 7, "title": "AI 에이전트와 MCP로 한계 넘기", "questions": [{"id": "7-1", "type": "multiple", "question": "커스텀 명령어와 AI 서브에이전트의 차이를 설명한 것 중 옳은 것은?", "options": ["① 서브에이전트는 .md 파일로 저장되지만, 커스텀 명령어는 .json 파일로 저장된다.", "② 에이전트는 독립적인 AI 모델을 선택할 수 있지만, 커스텀 명령어는 메인 세션의 모델을 공유한다.", "③ 커스텀 명령어가 서브에이전트보다 복잡한 판단이 필요한 작업에 더 적합하다.", "④ 서브에이전트는 적용을 위해 재시작이 필요하지만, 커스텀 명령어는 재시작 없이 바로 사용할 수 있다."], "answer": "②", "explanation": "에이전트는 생성 시 독립적으로 AI 모델을 선택할 수 있지만, 커스텀 명령어는 메인 세션의 모델을 그대로 공유한다. 두 파일 모두 .md 형식으로 저장된다."}, {"id": "7-2", "type": "multiple", "question": "MCP(Model Context Protocol)와 API의 차이를 설명한 것 중 가장 적절한 것은?", "options": ["① API는 특정 서비스 1개와 연결하고, MCP는 다양한 데이터와 도구를 표준 규격으로 통합 관리한다.", "② MCP는 API보다 항상 속도가 빠르다.", "③ API는 유료이고 MCP는 무료이다.", "④ MCP는 클로드 코드에서만 사용할 수 있다."], "answer": "①", "explanation": "API는 특정 서비스 하나와 연결하는 방식이고, MCP는 AI 모델이 외부 데이터, 도구, 서비스와 연결하는 표준화된 통신 규약으로 AI가 스스로 도구를 선택하여 활용할 수 있다."}, {"id": "7-3", "type": "multiple", "question": "깃허브에 코드를 업로드할 때 git 명령어의 올바른 실행 순서는?", "options": ["① commit -> add -> push", "② push -> add -> commit", "③ add -> commit -> push", "④ add -> push -> commit"], "answer": "③", "explanation": "깃허브 코드 업로드 순서는 add(staging area에 추가) -> commit(로컬 저장소에 저장) -> push(원격 저장소인 깃허브에 업로드) 순이다."}, {"id": "7-4", "type": "short", "question": "로컬 MCP와 원격 MCP의 차이점을 실행 위치, 인터넷 필요 여부, 인증 필요 여부를 중심으로 설명하시오.", "options": null, "answer": "로컬 MCP는 내 컴퓨터 안에서 직접 실행되어 인터넷이 필요 없고 별도 인증도 불필요하다. 원격 MCP는 인터넷상 외부 서버에서 실행되어 인터넷 연결이 반드시 필요하며 API 키나 OAuth 등 인증 절차가 필수이다.", "explanation": "로컬 MCP는 설정이 복잡하지만 속도가 빠르고 개인정보 보호에 유리하다. 원격 MCP는 URL만 지정하면 되어 설정이 간단하지만 네트워크와 인증이 필요하다."}, {"id": "7-5", "type": "short", "question": "AI 개발팀을 서브에이전트로 구성할 때 5W1H 프레임워크를 활용하는 이유와, 각 W/H 항목이 팀 개발에서 어떤 역할을 하는지 설명하시오.", "options": null, "answer": "5W1H(Who, What, When, Where, Why, How)를 통해 개발 요구사항을 명확히 정의하여 서브에이전트 팀이 역할별로 체계적으로 협업할 수 있도록 한다. Who는 어떤 에이전트가 구현하는지, What은 무엇을 만드는지, When은 언제 개발할지, Where는 어디서 사용하는지, Why는 왜 필요한지, How는 어떤 기술로 구현하는지를 명확히 한다.", "explanation": "요구사항이 명확해야 각 에이전트가 혼선 없이 전문 역할을 수행할 수 있으며, 실제 팀 개발과 동일한 협업 흐름을 만들 수 있다."}]}];
+
+// STATE
+let quiz = [];
+let cursor = 0;
+let score = 0;
+let wrongIds = [];
+let currentMode = '';
+
+function goHome() {
+  showScreen('s-home');
+  renderHomeStats();
+}
+
+function showWeeks() {
+  showScreen('s-weeks');
+  renderWeekGrid();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderHomeStats() {
+  const el = document.getElementById('home-stats');
+  const saved = JSON.parse(localStorage.getItem('vibe_scores') || '{}');
+  let html = '';
+  if (saved.all !== undefined) {
+    html += `<span class="score-badge">전체: ${saved.all.score}/${saved.all.total}점</span>`;
+  }
+  WEEKS.forEach(w => {
+    if (saved['w'+w.week] !== undefined) {
+      html += `<span class="score-badge">${w.week}주차: ${saved['w'+w.week].score}/${saved['w'+w.week].total}점</span>`;
+    }
+  });
+  el.innerHTML = html;
+
+  const savedWrong = JSON.parse(localStorage.getItem('vibe_wrong') || '[]');
+  const wBtn = document.querySelector('.btn-wrong');
+  wBtn.textContent = `틀린 문제만 풀기 (${savedWrong.length}문항)`;
+  wBtn.disabled = savedWrong.length === 0;
+}
+
+function renderWeekGrid() {
+  const saved = JSON.parse(localStorage.getItem('vibe_scores') || '{}');
+  const html = WEEKS.map(w => {
+    const sc = saved['w'+w.week];
+    const scoreLine = sc ? `<div class="score-line">최근: ${sc.score}/${sc.total}점</div>` : '<div class="score-line">미응시</div>';
+    return `<div class="week-card" onclick="startWeek(${w.week})">
+      <div class="wk-num">${w.week}주차</div>
+      <h3>${w.title}</h3>
+      <div style="font-size:.8rem;color:#718096;margin-bottom:8px;">${w.questions.length}문항</div>
+      ${scoreLine}
+    </div>`;
+  }).join('');
+  document.getElementById('week-grid').innerHTML = html;
+}
+
+function startAll() {
+  currentMode = 'all';
+  quiz = WEEKS.flatMap(w => w.questions);
+  beginQuiz();
+}
+
+function startWeek(num) {
+  currentMode = 'w' + num;
+  quiz = WEEKS.find(w => w.week === num).questions;
+  beginQuiz();
+}
+
+function startWrong() {
+  const savedWrong = JSON.parse(localStorage.getItem('vibe_wrong') || '[]');
+  if (!savedWrong.length) return;
+  currentMode = 'wrong';
+  quiz = WEEKS.flatMap(w => w.questions).filter(q => savedWrong.includes(q.id));
+  if (!quiz.length) { alert('틀린 문제가 없습니다.'); return; }
+  beginQuiz();
+}
+
+function beginQuiz() {
+  cursor = 0;
+  score = 0;
+  wrongIds = [];
+  showScreen('s-quiz');
+  showQ();
+}
+
+function showQ() {
+  const q = quiz[cursor];
+  const pct = (cursor / quiz.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-counter').textContent = `${cursor+1} / ${quiz.length}`;
+
+  // find week
+  const weekNum = q.id.split('-')[0];
+  const wk = WEEKS.find(w => w.week == weekNum);
+  document.getElementById('q-week-label').textContent = `${weekNum}주차 · ${wk ? wk.title : ''}`;
+
+  const badge = document.getElementById('q-type-badge');
+  badge.textContent = q.type === 'multiple' ? '객관식' : '주관식';
+  badge.className = 'q-type-badge ' + (q.type === 'multiple' ? 'badge-multiple' : 'badge-short');
+
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('explanation-box').style.display = 'none';
+  document.getElementById('answer-reveal-box').style.display = 'none';
+  document.getElementById('self-grade-box').style.display = 'none';
+  document.getElementById('btn-next').style.display = 'none';
+  document.getElementById('btn-check').style.display = 'none';
+
+  const optDiv = document.getElementById('q-options');
+  const shortArea = document.getElementById('q-short');
+
+  if (q.type === 'multiple') {
+    optDiv.style.display = 'flex';
+    shortArea.style.display = 'none';
+    const frag = document.createDocumentFragment();
+    q.options.forEach((opt, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opt-btn';
+      btn.textContent = opt;
+      btn.onclick = () => selectOpt(i, btn);
+      frag.appendChild(btn);
+    });
+    optDiv.innerHTML = '';
+    optDiv.appendChild(frag);
+  } else {
+    optDiv.style.display = 'none';
+    shortArea.style.display = 'block';
+    shortArea.value = '';
+    document.getElementById('btn-check').style.display = 'block';
+  }
+}
+
+function selectOpt(idx, btn) {
+  const q = quiz[cursor];
+  const allBtns = document.querySelectorAll('#q-options .opt-btn');
+  allBtns.forEach(b => { b.disabled = true; });
+
+  const selectedText = btn.textContent.trim();
+  const answerNum = q.answer.trim();
+  const isCorrect = selectedText.startsWith(answerNum);
+
+  if (isCorrect) {
+    btn.classList.add('correct');
+    score++;
+  } else {
+    btn.classList.add('wrong-sel');
+    wrongIds.push(q.id);
+    allBtns.forEach(b => {
+      if (b.textContent.trim().startsWith(answerNum)) b.classList.add('show-correct');
+    });
+  }
+
+  showExplanation(q);
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function checkAnswer() {
+  const q = quiz[cursor];
+  document.getElementById('btn-check').style.display = 'none';
+  const revealBox = document.getElementById('answer-reveal-box');
+  revealBox.innerHTML = `<strong>모범 답안:</strong><br>${q.answer}`;
+  revealBox.style.display = 'block';
+  showExplanation(q);
+  document.getElementById('self-grade-box').style.display = 'flex';
+}
+
+function selfGrade(correct) {
+  const q = quiz[cursor];
+  document.getElementById('self-grade-box').style.display = 'none';
+  if (correct) {
+    score++;
+  } else {
+    wrongIds.push(q.id);
+  }
+  document.getElementById('btn-next').style.display = 'block';
+}
+
+function showExplanation(q) {
+  const box = document.getElementById('explanation-box');
+  box.innerHTML = `<strong>해설:</strong> ${q.explanation}`;
+  box.style.display = 'block';
+}
+
+function nextQ() {
+  cursor++;
+  if (cursor >= quiz.length) {
+    showResult();
+  } else {
+    showQ();
+  }
+}
+
+function showResult() {
+  showScreen('s-result');
+
+  const total = quiz.length;
+  const pct = Math.round((score / total) * 100);
+  let grade = 'F', gClass = 'grade-F';
+  if (pct >= 90) { grade = 'A'; gClass = 'grade-A'; }
+  else if (pct >= 80) { grade = 'B'; gClass = 'grade-B'; }
+  else if (pct >= 70) { grade = 'C'; gClass = 'grade-C'; }
+  else if (pct >= 60) { grade = 'D'; gClass = 'grade-D'; }
+
+  const circle = document.getElementById('grade-circle');
+  circle.textContent = grade;
+  circle.className = 'grade-circle ' + gClass;
+  document.getElementById('result-score').textContent = `${score} / ${total} (${pct}%)`;
+
+  // save score
+  const saved = JSON.parse(localStorage.getItem('vibe_scores') || '{}');
+  saved[currentMode] = { score, total, pct, grade, date: new Date().toLocaleDateString('ko-KR') };
+  localStorage.setItem('vibe_scores', JSON.stringify(saved));
+
+  // save wrong answers (merge)
+  const prevWrong = JSON.parse(localStorage.getItem('vibe_wrong') || '[]');
+  const newWrong = [...new Set([...prevWrong.filter(id => {
+    // remove IDs from current quiz set (to reflect new results)
+    return !quiz.find(q => q.id === id);
+  }), ...wrongIds])];
+  localStorage.setItem('vibe_wrong', JSON.stringify(newWrong));
+
+  // show wrong list
+  const wrongDiv = document.getElementById('wrong-list');
+  const wrongItems = document.getElementById('wrong-items');
+  if (wrongIds.length) {
+    wrongItems.innerHTML = wrongIds.map(id => {
+      const q = quiz.find(q => q.id === id);
+      return `<div class="wrong-item">${id} · ${q ? q.question.substring(0, 40) + '...' : ''}</div>`;
+    }).join('');
+    wrongDiv.style.display = 'block';
+  } else {
+    wrongDiv.style.display = 'none';
+  }
+}
+
+function retryQuiz() {
+  beginQuiz();
+}
+
+// Init
+renderHomeStats();
+</script>
+</body>
+</html>
